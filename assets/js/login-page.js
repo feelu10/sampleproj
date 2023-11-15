@@ -16,51 +16,34 @@ document.addEventListener("DOMContentLoaded", function () {
       const email = emailInput.value;
       const password = passwordInput.value;
 
-      console.log("Login form submitted:", { email, password });
-
       // Send a POST request to your server with the login data
       try {
-        const response = await fetch("/login", {
+        const response =await fetch("/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, password }),
         });
-
-        console.log("Login response:", response);
-
         if (!response.ok) {
           // Handle login failure
-          console.error("Error during login:", response.statusText);
+          console.error('Error during login:', response.statusText);
           return;
         }
 
         // Parse the JSON response
         const data = await response.json();
 
-        console.log("Login data:", data);
-
         // Check the user's account type and redirect accordingly
-        if (data.accountType === "Student") {
-          // Store student data in sessionStorage
-          sessionStorage.setItem(
-            "studentData",
-            JSON.stringify(data.studentData)
-          );
-          window.location.href = "/StudentHomepage"; // Redirect to student homepage
-        } else if (data.accountType === "Counselor") {
-          // Store counselor data in sessionStorage
-          sessionStorage.setItem(
-            "counselorData",
-            JSON.stringify(data.counselorData)
-          );
-          window.location.href = "/CounselorHomepage"; // Redirect to counselor homepage
+        if (data.accountType === 'Student') {
+          window.location.href = '/StudentHomepage'; // Redirect to student homepage
+        } else if (data.accountType === 'Counselor') {
+          window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
         } else {
-          console.error("Unknown account type:", data.accountType);
+          console.error('Unknown account type:', data.accountType);
         }
       } catch (error) {
-        console.error("Error during login:", error);
+        console.error('Error during login:', error);
       }
     });
   }
