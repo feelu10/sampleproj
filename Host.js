@@ -1,46 +1,43 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
-const session = require("express-session");
-const { createClient } = require("@supabase/supabase-js");
-
 const myapp = express();
-const port = process.env.PORT || 3030;
+const port = 3030;
+const bcrypt = require("bcryptjs");
+const session = require("express-session");
+
 myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
-myapp.use(cors());
+// Middleware to parse JSON requests
 myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
-myapp.use(express.static(__dirname + "/assets"));
-
-myapp.set("trust proxy", 1);
-
-myapp.use(
-  session({
-    secret: "your_secure_secret", // Change this to a more secure secret
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === "production" },
-  })
-);
+myapp.use(cors());
 
 myapp.set("view engine", "ejs");
 myapp.set("views", __dirname + "/view");
+myapp.use(express.static(__dirname + "/assets"));
+
+myapp.use(
+  session({
+    secret: "123",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
 
 myapp.use((req, res, next) => {
-  const studentData =
-    req.session.studentData; /* Your logic to retrieve student data */
-  // Pass studentData to all EJS templates
-  res.locals.studentData = studentData;
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
 
 // Supabase configuration
+const { createClient, SupabaseClient } = require("@supabase/supabase-js");
 const supabase = createClient(
   "https://waeqvekicdlqijxmhclw.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXF2ZWtpY2RscWlqeG1oY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTUyNjMxNjIsImV4cCI6MjAxMDgzOTE2Mn0.8Ga9_qwNgeAKlqWI_xCLQPJFqGha3XfiNMxrT8_RXaM"
@@ -56,19 +53,13 @@ myapp.get("/Registerpage", (req, res) => {
 });
 
 myapp.get("/StudentHomepage", (req, res) => {
-  try {
-    const studentData = req.session.studentData || {};
-    res.render("StudentHomepage", { studentData });
-  } catch (error) {
-    console.error("Error in /StudentHomepage:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+  const studentData = req.session.studentData || {};
+  console.log('try lng ni ha',studentData);
+  res.render("StudentHomepage", { studentData });
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
-  const studentData =
-    req.session.studentData ||
-    JSON.parse(sessionStorage.getItem("studentData"));
+  const studentData = req.session.studentData;
   res.render("studentProfilePage", { studentData });
 });
 
@@ -171,9 +162,17 @@ myapp.get("/CreateAppointmentPage", (req, res) => {
 });
 
 myapp.get("/CounselorHomePage", async (req, res) => {
+  console.log("Session data of Counselor:", req.session);
+
   let hasNewAppointments;
   try {
     const counselorData = req.session.counselorData;
+
+    if (!counselorData || !counselorData.email) {
+      console.error("Counselor data not found in session.");
+      return res.status(401).send("Unauthorized");
+    }
+
     const counselorEmail = counselorData.email;
 
     // Fetch counselor's departments
@@ -181,14 +180,6 @@ myapp.get("/CounselorHomePage", async (req, res) => {
       .from("Counselor Role")
       .select("department")
       .eq("email", counselorEmail);
-
-    if (counselorError) {
-      console.error(
-        "Error fetching counselor departments:",
-        counselorError.message
-      );
-      return res.status(500).send("Internal server error");
-    }
 
     const departments = counselorDepartments.map((entry) => entry.department);
 
@@ -835,6 +826,8 @@ myapp.post("/register", async (req, res) => {
 });
 
 // LOGIN
+// Existing code...
+
 myapp.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -844,17 +837,20 @@ myapp.post("/login", async (req, res) => {
       password,
     });
 
+    console.log("Login response for all data:", data);
+
     if (loginError) {
       console.error("Error logging in:", loginError.message);
-      return res.status(500).json({ error: "Login failed" });
+      res.status(500).json({ error: "Login failed" });
+      return;
     }
 
     if (!data || !data.user) {
       console.error("Authentication failed");
-      return res.status(401).json({ error: "Authentication failed" });
+      res.status(401).json({ error: "Authentication failed" });
+      return;
     }
-
-    console.log("User authenticated:", data.user);
+    console.log(data || data.userData);
 
     // Fetch the student data from the specific table
     const { data: studentData, error: studentError } = await supabase
@@ -865,15 +861,14 @@ myapp.post("/login", async (req, res) => {
 
     // Check if the user is a student
     if (studentData) {
-      console.log("Student data found:", studentData);
+      console.log(studentData);
 
       // Store the student data in the session
       req.session.studentData = studentData;
-      return res.status(200).json({
-        success: "Login successful",
-        accountType: "Student",
-        studentData: studentData, // Include studentData in the response
-      });
+      res
+        .status(200)
+        .json({ success: "Login successful", accountType: "Student" });
+      return;
     } else {
       // Fetch the counselor data from the specific table
       const { data: counselorData, error: counselorError } = await supabase
@@ -884,23 +879,26 @@ myapp.post("/login", async (req, res) => {
 
       // Check if the user is a counselor
       if (counselorData) {
-        console.log("Counselor data found:", counselorData);
+        console.log("Counselor data fetched:", counselorData);
+
         // Store the counselor data in the session
         req.session.counselorData = counselorData;
-        // Redirect to the counselor homepage
-        return res.status(200).json({
-          success: "Login successful",
-          accountType: "Counselor",
-          counselorData: counselorData, // Include counselorData in the response
-        });
+
+        // Send a success response with account type
+        res
+          .status(200)
+          .json({ success: "Login successful", accountType: "Counselor" });
+
+        return;
       } else {
-        console.error("User data not found");
-        return res.status(404).json({ error: "User not found" });
+        console.error("Counselor data not found");
+        res.status(404).json({ error: "Counselor not found" });
+        return;
       }
     }
   } catch (e) {
-    console.error("Unexpected error during login:", e);
-    return res.status(500).json({ error: "Login failed" });
+    console.error("Unexpected error:", e);
+    res.status(500).json({ error: "Login failed" });
   }
 });
 
