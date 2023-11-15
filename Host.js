@@ -54,7 +54,7 @@ myapp.get("/Registerpage", (req, res) => {
   res.render("RegisterPage");
 });
 
-myapp.get("/StudentHomepages", (req, res) => {
+myapp.get("/StudentHomepage", (req, res) => {
   // Check if the user is logged in as a student
   if (req.session.studentData) {
     const studentData = req.session.studentData;
