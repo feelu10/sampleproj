@@ -43,6 +43,18 @@ const supabase = createClient(
 );
 
 //=========GETTING===========//
+const checkLoggedIn = (req, res, next) => {
+  const studentData = req.session.studentData;
+  if (studentData) {
+    res.locals.studentData = studentData;
+  }
+  next();
+};
+
+// Apply the middleware globally
+myapp.use(checkLoggedIn);
+
+// Your existing routes
 myapp.get("/", (req, res) => {
   res.render("LoginPage");
 });
@@ -53,10 +65,10 @@ myapp.get("/Registerpage", (req, res) => {
 
 myapp.get("/StudentHomepages", (req, res) => {
   // Check if the user is logged in as a student
-  if (req.session.studentData) {
-    const studentData = req.session.studentData;
+  if (res.locals.studentData) {
+    const studentData = res.locals.studentData;
     res.render("StudentHomepage", { studentData });
-    console.log(req.session.studentData);
+    console.log(res.locals.studentData);
   } else {
     // Redirect to the login page if the user is not logged in
     res.redirect("/");
@@ -65,8 +77,8 @@ myapp.get("/StudentHomepages", (req, res) => {
 
 myapp.get("/studentProfilePage", (req, res) => {
   // Check if the user is logged in as a student
-  if (req.session.studentData) {
-    const studentData = req.session.studentData;
+  if (res.locals.studentData) {
+    const studentData = res.locals.studentData;
     res.render("studentProfilePage", { studentData });
   } else {
     // Redirect to the login page if the user is not logged in
