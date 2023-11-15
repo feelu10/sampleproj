@@ -1,34 +1,31 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
-const session = require("express-session");
 const myapp = express();
-const port = process.env.PORT || 3030; // Allow using the provided port or default to 3030
+const port = 3030;
 const bcrypt = require("bcryptjs");
-
-myapp.use(cors());
-myapp.use(express.json());
-myapp.use(express.urlencoded({ extended: true }));
-myapp.use(express.static(__dirname + "/assets"));
-
-// Trust the first proxy if your app is hosted behind one (replace 'trust proxy' with the specific IP or URL of your proxy if needed)
-myapp.set("trust proxy", 1);
-
-myapp.use(
-  session({
-    secret: "your_secure_secret", // Change this to a more secure secret
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === "production" }, // Set secure to true in production
-  })
-);
-
-myapp.set("view engine", "ejs");
-myapp.set("views", __dirname + "/view");
+const session = require("express-session");
 
 myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+// Middleware to parse JSON requests
+myapp.use(express.json());
+myapp.use(express.urlencoded({ extended: true }));
+myapp.use(cors());
+
+myapp.set("view engine", "ejs");
+myapp.set("views", __dirname + "/view");
+myapp.use(express.static(__dirname + "/assets"));
+
+myapp.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
 
 myapp.use((req, res, next) => {
   const studentData =
@@ -57,14 +54,27 @@ myapp.get("/Registerpage", (req, res) => {
   res.render("RegisterPage");
 });
 
-myapp.get("/StudentHomepage", (req, res) => {
-  const studentData = req.session.studentData;
-  res.render("StudentHomepage", { studentData });
+myapp.get("/StudentHomepages", (req, res) => {
+  // Check if the user is logged in as a student
+  if (req.session.studentData) {
+    const studentData = req.session.studentData;
+    res.render("StudentHomepage", { studentData });
+    console.log(req.session.studentData);
+  } else {
+    // Redirect to the login page if the user is not logged in
+    res.redirect("/");
+  }
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
-  const studentData = req.session.studentData;
-  res.render("studentProfilePage", { studentData });
+  // Check if the user is logged in as a student
+  if (req.session.studentData) {
+    const studentData = req.session.studentData;
+    res.render("studentProfilePage", { studentData });
+  } else {
+    // Redirect to the login page if the user is not logged in
+    res.redirect("/");
+  }
 });
 
 myapp.get("/studentAppointmentStatus", async (req, res) => {
