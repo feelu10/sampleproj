@@ -43,8 +43,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Check the user's account type and redirect accordingly
         if (data.accountType === "Student") {
+          // Store student data in sessionStorage
+          sessionStorage.setItem(
+            "studentData",
+            JSON.stringify(data.studentData)
+          );
           window.location.href = "/StudentHomepage"; // Redirect to student homepage
         } else if (data.accountType === "Counselor") {
+          // Store counselor data in sessionStorage
+          sessionStorage.setItem(
+            "counselorData",
+            JSON.stringify(data.counselorData)
+          );
           window.location.href = "/CounselorHomepage"; // Redirect to counselor homepage
         } else {
           console.error("Unknown account type:", data.accountType);
@@ -55,4 +65,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-  
