@@ -56,11 +56,13 @@ myapp.get("/Registerpage", (req, res) => {
 });
 
 myapp.get("/StudentHomepage", (req, res) => {
-  const studentData =
-    req.session.studentData ||
-    JSON.parse(sessionStorage.getItem("studentData"));
-  res.render("StudentHomepage", { studentData });
-  console.log(studentData);
+  try {
+    const studentData = req.session.studentData || {};
+    res.render("StudentHomepage", { studentData });
+  } catch (error) {
+    console.error("Error in /StudentHomepage:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
