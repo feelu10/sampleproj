@@ -1,31 +1,30 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
-const myapp = express();
-const port = 3030;
-const bcrypt = require("bcryptjs");
 const session = require("express-session");
+const { createClient } = require("@supabase/supabase-js");
 
-myapp.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-// Middleware to parse JSON requests
+const myapp = express();
+const port = process.env.PORT || 3030;
+
+myapp.use(cors());
 myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
-myapp.use(cors());
-
-myapp.set("view engine", "ejs");
-myapp.set("views", __dirname + "/view");
 myapp.use(express.static(__dirname + "/assets"));
+
+myapp.set("trust proxy", 1);
 
 myapp.use(
   session({
-    secret: "your_secret_key",
+    secret: "your_secure_secret", // Change this to a more secure secret
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: process.env.NODE_ENV === "production" },
   })
 );
+
+myapp.set("view engine", "ejs");
+myapp.set("views", __dirname + "/view");
 
 myapp.use((req, res, next) => {
   const studentData =
@@ -54,7 +53,7 @@ myapp.get("/Registerpage", (req, res) => {
   res.render("RegisterPage");
 });
 
-myapp.get("/StudentHomepage", (req, res) => {
+myapp.get("/StudentHomepages", (req, res) => {
   // Check if the user is logged in as a student
   if (req.session.studentData) {
     const studentData = req.session.studentData;
