@@ -6,6 +6,9 @@ const { createClient } = require("@supabase/supabase-js");
 
 const myapp = express();
 const port = process.env.PORT || 3030;
+myapp.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
 
 myapp.use(cors());
 myapp.use(express.json());
@@ -37,24 +40,13 @@ myapp.use((req, res, next) => {
   next();
 });
 
+// Supabase configuration
 const supabase = createClient(
   "https://waeqvekicdlqijxmhclw.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXF2ZWtpY2RscWlqeG1oY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTUyNjMxNjIsImV4cCI6MjAxMDgzOTE2Mn0.8Ga9_qwNgeAKlqWI_xCLQPJFqGha3XfiNMxrT8_RXaM"
 );
 
 //=========GETTING===========//
-const checkLoggedIn = (req, res, next) => {
-  const studentData = req.session.studentData;
-  if (studentData) {
-    res.locals.studentData = studentData;
-  }
-  next();
-};
-
-// Apply the middleware globally
-myapp.use(checkLoggedIn);
-
-// Your existing routes
 myapp.get("/", (req, res) => {
   res.render("LoginPage");
 });
@@ -63,27 +55,15 @@ myapp.get("/Registerpage", (req, res) => {
   res.render("RegisterPage");
 });
 
-myapp.get("/StudentHomepages", (req, res) => {
-  // Check if the user is logged in as a student
-  if (res.locals.studentData) {
-    const studentData = res.locals.studentData;
-    res.render("StudentHomepage", { studentData });
-    console.log(res.locals.studentData);
-  } else {
-    // Redirect to the login page if the user is not logged in
-    res.redirect("/");
-  }
+myapp.get("/StudentHomepage", (req, res) => {
+  const studentData = req.session.studentData;
+  res.render("StudentHomepage", { studentData });
+  console.log(req.session.studentData);
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
-  // Check if the user is logged in as a student
-  if (res.locals.studentData) {
-    const studentData = res.locals.studentData;
-    res.render("studentProfilePage", { studentData });
-  } else {
-    // Redirect to the login page if the user is not logged in
-    res.redirect("/");
-  }
+  const studentData = req.session.studentData;
+  res.render("studentProfilePage", { studentData });
 });
 
 myapp.get("/studentAppointmentStatus", async (req, res) => {
