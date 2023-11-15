@@ -54,19 +54,18 @@ myapp.get("/Registerpage", (req, res) => {
 
 myapp.get("/StudentHomepage", (req, res) => {
   const studentData = req.session.studentData || {};
-  console.log('try lng ni ha',studentData);
   res.render("StudentHomepage", { studentData });
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData = req.session.studentData || {};
   res.render("studentProfilePage", { studentData });
 });
 
 myapp.get("/studentAppointmentStatus", async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const studentData = req.session.studentData;
+    const studentData = req.session.studentData || {};
     const studentEmail = studentData.email; // Assuming the email is stored in counselorData
 
     // Fetch pending appointments data for all departments associated with the counselor
@@ -110,7 +109,7 @@ myapp.get("/studentAppointmentStatus", async (req, res) => {
 myapp.get("/studentAppointmentHistory", async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const studentData = req.session.studentData;
+    const studentData = req.session.studentData || {};
     const studentEmail = studentData.email; // Assuming the email is stored in counselorData
 
     // Fetch pending appointments data for all departments associated with the counselor
@@ -153,11 +152,12 @@ myapp.get("/studentAppointmentHistory", async (req, res) => {
 });
 
 myapp.get("/CounselorList", (req, res) => {
+  const counselorData = req.session.counselorData || {};
   res.render("CounselorList");
 });
 
 myapp.get("/CreateAppointmentPage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData = req.session.studentData || {};
   res.render("CreateAppointmentPage", { studentData });
 });
 
@@ -166,14 +166,16 @@ myapp.get("/CounselorHomePage", async (req, res) => {
 
   let hasNewAppointments;
   try {
-    const counselorData = req.session.counselorData;
+    console.log("Session data before counselorData retrieval:", req.session);
+    const counselorData = req.session.counselorData || {};
+    console.log("Counselor data retrieved:", counselorData);
 
-    if (!counselorData || !counselorData.email) {
-      console.error("Counselor data not found in session.");
-      return res.status(401).send("Unauthorized");
-    }
+    // if (!counselorData || !counselorData.email) {
+    //   console.error("Counselor data not found in session.");
+    //   return res.status(401).send("Unauthorized");
+    // }
 
-    const counselorEmail = counselorData.email;
+    const counselorEmail = counselorData.email || {};
 
     // Fetch counselor's departments
     const { data: counselorDepartments, error: counselorError } = await supabase
@@ -291,15 +293,15 @@ myapp.get("/CounselorHomePage", async (req, res) => {
 });
 
 myapp.get("/CounselorProfilePage", (req, res) => {
-  const counselorData = req.session.counselorData;
+  const counselorData = req.session.counselorData || {};
   res.render("CounselorProfilePage", { counselorData });
 });
 
 myapp.get("/CounselorPendingAppointmentPage", async (req, res) => {
   let hasNewAppointments;
   try {
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email;
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
 
     // Fetch counselor's departments
     const { data: counselorDepartments, error: counselorError } = await supabase
@@ -442,16 +444,13 @@ myapp.get("/CounselorPendingAppointmentPage", async (req, res) => {
 
 myapp.get("/CounselorAcceptedAppointmentPage", async (req, res) => {
   try {
-    // Extract counselor's email from the session data
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email; // Assuming the email is stored in counselorData
-
-    // Fetch pending appointments data for all departments associated with the counselor
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
     const { data: acceptedAppointments, error } = await supabase
-      .from("Accepted Appointment") // Replace with your actual table name
+      .from("Accepted Appointment")
       .select("*")
       .eq("counselor_email", counselorEmail)
-      .order("date", { ascending: true }); // You can add additional query options here
+      .order("date", { ascending: true });
 
     if (error) {
       // Handle the error if the query for pending appointments fails
@@ -473,9 +472,8 @@ myapp.get("/CounselorAcceptedAppointmentPage", async (req, res) => {
 myapp.get("/CounselorAppointmentHistoryPage", async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email; // Assuming the email is stored in counselorData
-
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
     // Fetch pending appointments data for all departments associated with the counselor
     const { data: appointmentHistory, error } = await supabase
       .from("Appointment History") // Replace with your actual table name
@@ -502,8 +500,8 @@ myapp.get("/CounselorAppointmentHistoryPage", async (req, res) => {
 
 myapp.get("/CounselorLogs", async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email;
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
     const { data: counselorLog, error } = await supabase
       .from("Report")
       .select("*")
@@ -526,7 +524,7 @@ myapp.get("/CounselorLogs", async (req, res) => {
 });
 
 myapp.get("/CounselorReport", (req, res) => {
-  const counselorData = req.session.counselorData;
+  const counselorData = req.session.counselorData || {};
   res.render("CounselorReport", { counselorData });
 });
 
