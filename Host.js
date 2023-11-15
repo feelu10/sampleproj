@@ -56,13 +56,17 @@ myapp.get("/Registerpage", (req, res) => {
 });
 
 myapp.get("/StudentHomepage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData =
+    req.session.studentData ||
+    JSON.parse(sessionStorage.getItem("studentData"));
   res.render("StudentHomepage", { studentData });
-  console.log(req.session.studentData);
+  console.log(studentData);
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData =
+    req.session.studentData ||
+    JSON.parse(sessionStorage.getItem("studentData"));
   res.render("studentProfilePage", { studentData });
 });
 
@@ -866,6 +870,7 @@ myapp.post("/login", async (req, res) => {
       return res.status(200).json({
         success: "Login successful",
         accountType: "Student",
+        studentData: studentData, // Include studentData in the response
       });
     } else {
       // Fetch the counselor data from the specific table
@@ -884,6 +889,7 @@ myapp.post("/login", async (req, res) => {
         return res.status(200).json({
           success: "Login successful",
           accountType: "Counselor",
+          counselorData: counselorData, // Include counselorData in the response
         });
       } else {
         console.error("User data not found");
