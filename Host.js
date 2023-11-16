@@ -23,7 +23,7 @@ myapp.use(
     secret: "123",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: true },
   })
 );
 
