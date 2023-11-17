@@ -28,15 +28,15 @@ myapp.use(
 );
 
 const setStudentDataMiddleware = async (req, res, next) => {
-  const studentData =
-    req.session.studentData; /* Your logic to retrieve student data */
+  const studentData = req.session.studentData; /* Your logic to retrieve student data */
   // Pass studentData to all EJS templates
-  res.session.studentData = studentData;
+  res.locals.studentData = studentData; // Use res.locals to make it available in EJS templates
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
   next();
 };
+
 
 myapp.use(
   ["/StudentHomepage", "/studentProfilePage"],
