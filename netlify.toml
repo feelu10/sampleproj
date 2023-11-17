@@ -3,8 +3,8 @@
   functions = "functions"
 
 
+
 [[redirects]]
-  from = "/assets/*"
-  to = "/assets/:splat"
+  from = "/*"
+  to = "/StudentHomepage.ejs"
   status = 200
-  force = true
