@@ -15,8 +15,8 @@ myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
 myapp.use(cors());
 
-myapp.set("view engine", "ejs");
-myapp.set("views", __dirname + "/view");
+myapp.set('view engine', 'ejs');
+myapp.set('views', path.join(__dirname, '../view'));
 myapp.use(express.static(__dirname + "/assets"));
 
 myapp.use(
