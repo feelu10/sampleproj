@@ -856,14 +856,14 @@ myapp.post("/login", async (req, res) => {
     // Handle authentication errors
     if (loginError) {
       console.error("Error logging in:", loginError.message);
-      res.status(500).json({ error: "Login failed" });
+      res.status(500).render("LoginPage", { errorMessage: "Login failed" });
       return;
     }
 
     // Check if user data exists
     if (!data || !data.user) {
       console.error("Authentication failed");
-      res.status(401).json({ error: "Authentication failed" });
+      res.status(401).render("LoginPage", { errorMessage: "Authentication failed" });
       return;
     }
 
@@ -879,9 +879,7 @@ myapp.post("/login", async (req, res) => {
       // Store the student data in the session
       req.session.studentData = studentData;
       console.log("Student Data in Login Route:", req.session.studentData);
-      res
-        .status(200)
-        .json({ success: "Login successful", accountType: "Student" });
+      res.redirect("/StudentHomepage"); // Redirect to the student homepage
       return;
     } else {
       // Fetch the counselor data from the specific table
@@ -896,20 +894,19 @@ myapp.post("/login", async (req, res) => {
         // Store the counselor data in the session
         req.session.counselorData = counselorData;
         // Redirect to the counselor homepage
-        res
-          .status(200)
-          .json({ success: "Login successful", accountType: "Counselor" });
+        res.redirect("/counselorHomepage");
         return;
       } else {
         console.error("User data not found");
-        res.status(404).json({ error: "User not found" });
+        res.status(404).render("LoginPage", { errorMessage: "User not found" });
       }
     }
   } catch (e) {
     console.error("Unexpected error:", e);
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).render("LoginPage", { errorMessage: "Login failed" });
   }
 });
+
 
 // APPOINTMENT
 myapp.post("/create-appointment", async (req, res) => {
