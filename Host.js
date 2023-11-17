@@ -21,7 +21,7 @@ myapp.use(express.static(__dirname + "/assets"));
 myapp.use(
   session({
     secret: "your_secret_key",
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     cookie: { secure: false },
   })
