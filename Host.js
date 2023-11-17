@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
 const myapp = express();
-const port = 3030;
+const port = process.env.PORT || 3030;
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 
