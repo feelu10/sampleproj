@@ -38,16 +38,8 @@ const setStudentDataMiddleware = async (req, res, next) => {
   next();
 };
 
-myapp.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Internal Server Error");
-});
-
 myapp.use(
-  [
-    "https://sampleproj-vert.vercel.app/StudentHomepage",
-    "https://sampleproj-vert.vercel.app/studentProfilePage",
-  ],
+  ["/StudentHomepage", "/studentProfilePage"],
   setStudentDataMiddleware
 );
 
@@ -67,23 +59,17 @@ myapp.get("/Registerpage", (req, res) => {
   res.render("RegisterPage");
 });
 
-myapp.get(
-  "https://sampleproj-vert.vercel.app/StudentHomepage",
-  async (req, res) => {
-    const studentData = await req.session.studentData;
-    res.render("StudentHomepage", { studentData });
-    console.log("this is studenthomepage", studentData);
-  }
-);
+myapp.get("/StudentHomepage", async (req, res) => {
+  const studentData = await req.session.studentData;
+  res.render("StudentHomepage", { studentData });
+  console.log("this is studenthomepage", studentData);
+});
 
-myapp.get(
-  "https://sampleproj-vert.vercel.app/studentProfilePage",
-  async (req, res) => {
-    const studentData = await req.session.studentData;
-    res.render("studentProfilePage", { studentData });
-    console.log("this is studentprofpage", studentData);
-  }
-);
+myapp.get("/studentProfilePage", async (req, res) => {
+  const studentData = await req.session.studentData;
+  res.render("studentProfilePage", { studentData });
+  console.log("this is studentprofpage", studentData);
+});
 
 myapp.get("/studentAppointmentStatus", async (req, res) => {
   try {
