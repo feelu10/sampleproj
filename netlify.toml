@@ -1,6 +1,6 @@
 [build]
   functions = "functions"
-  publish = "views"  # Adjust this based on your static assets directory
+  publish = "views" 
 
 [[redirects]]
   from = "/assets/*"

@@ -2,13 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
 const myapp = express();
-const port = process.env.PORT || 3030;
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 
-myapp.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// const port = process.env.PORT || 3030;
+// myapp.listen(port, () => {
+//   console.log(`Server is running on http://localhost:${port}`);
+// });
+
 // Middleware to parse JSON requests
 myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
@@ -1682,3 +1683,10 @@ myapp.post("/adminCreateAccount", async (req, res) => {
     res.status(500).json({ error: "Registration failed" });
   }
 });
+
+
+// Convert the express app to a Netlify function
+exports.handler = (event, context) => {
+  const handler = app;
+  return handler(event, context);
+};
