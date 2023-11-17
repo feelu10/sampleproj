@@ -1,15 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
+const session = require("express-session");
 const myapp = express();
 const port = process.env.PORT || 3030;
 const bcrypt = require("bcryptjs");
-const session = require("express-session");
 
 myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-// Middleware to parse JSON requests
+
 myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
 myapp.use(cors());
@@ -21,7 +21,7 @@ myapp.use(express.static(__dirname + "/assets"));
 myapp.use(
   session({
     secret: "your_secret_key",
-    resave: true,
+    resave: false, // Set to false to avoid session being saved on every request
     saveUninitialized: true,
     cookie: { secure: false },
   })
@@ -44,13 +44,13 @@ myapp.use(
 );
 
 // Supabase configuration
-const { createClient, SupabaseClient } = require("@supabase/supabase-js");
+const { createClient } = require("@supabase/supabase-js");
 const supabase = createClient(
   "https://waeqvekicdlqijxmhclw.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXF2ZWtpY2RscWlqeG1oY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTUyNjMxNjIsImV4cCI6MjAxMDgzOTE2Mn0.8Ga9_qwNgeAKlqWI_xCLQPJFqGha3XfiNMxrT8_RXaM"
+  "YOUR_SUPABASE_API_KEY"
 );
 
-//=========GETTING===========//
+// Routes
 myapp.get("/", (req, res) => {
   res.render("LoginPage");
 });
@@ -69,7 +69,6 @@ myapp.get("/StudentHomepage", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
 
 myapp.get("/studentProfilePage", async (req, res) => {
   try {
