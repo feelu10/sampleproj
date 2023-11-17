@@ -43,6 +43,13 @@ myapp.use(
   setStudentDataMiddleware
 );
 
+const corsOptions = {
+  origin: "https://sampleproj-vert.vercel.app",
+  credentials: true, // include credentials in CORS headers (e.g., cookies)
+};
+
+myapp.use(cors(corsOptions));
+
 // Supabase configuration
 const { createClient, SupabaseClient } = require("@supabase/supabase-js");
 const supabase = createClient(
