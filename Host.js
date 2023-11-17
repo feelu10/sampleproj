@@ -6,9 +6,22 @@ const myapp = express();
 const port = process.env.PORT || 3030;
 const bcrypt = require("bcryptjs");
 
-myapp.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+myapp.use(express.json());
+myapp.use(express.urlencoded({ extended: true }));
+myapp.use(cors());
+
+myapp.set("view engine", "ejs");
+myapp.set("views", __dirname + "/view");
+myapp.use(express.static(__dirname + "/assets"));
+
+myapp.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
 
 // Middleware to set studentData
 const setStudentDataMiddleware = async (req, res, next) => {
@@ -22,22 +35,9 @@ myapp.use(
   setStudentDataMiddleware
 );
 
-myapp.use(express.json());
-myapp.use(express.urlencoded({ extended: true }));
-myapp.use(cors());
-
-myapp.set("view engine", "ejs");
-myapp.set("views", __dirname + "/view");
-myapp.use(express.static(__dirname + "/assets"));
-
-myapp.use(
-  session({
-    secret: "your_secret_key",
-    resave: false, // Set to false to avoid session being saved on every request
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
-);
+myapp.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
 
 // Supabase configuration
 const { createClient } = require("@supabase/supabase-js");
@@ -45,6 +45,7 @@ const supabase = createClient(
   "https://waeqvekicdlqijxmhclw.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXF2ZWtpY2RscWlqeG1oY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTUyNjMxNjIsImV4cCI6MjAxMDgzOTE2Mn0.8Ga9_qwNgeAKlqWI_xCLQPJFqGha3XfiNMxrT8_RXaM"
 );
+
 
 // Routes
 myapp.get("/", (req, res) => {
