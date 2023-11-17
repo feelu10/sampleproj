@@ -10,6 +10,18 @@ myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
+// Middleware to set studentData
+const setStudentDataMiddleware = async (req, res, next) => {
+  const studentData = req.session.studentData || {};
+  res.locals.studentData = studentData;
+  next();
+};
+
+myapp.use(
+  ["/StudentHomepage", "/studentProfilePage"],
+  setStudentDataMiddleware
+);
+
 myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
 myapp.use(cors());
@@ -27,28 +39,13 @@ myapp.use(
   })
 );
 
-const setStudentDataMiddleware = async (req, res, next) => {
-  console.log("Middleware executed");
-  const studentData = req.session.studentData;
-  console.log("Student Data in Middleware:", studentData);
-  res.locals.studentData = studentData;
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  next();
-};
-
-myapp.use(
-  ["/StudentHomepage", "/studentProfilePage"],
-  setStudentDataMiddleware
-);
-
 // Supabase configuration
 const { createClient } = require("@supabase/supabase-js");
 const supabase = createClient(
   "https://waeqvekicdlqijxmhclw.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXF2ZWtpY2RscWlqeG1oY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTUyNjMxNjIsImV4cCI6MjAxMDgzOTE2Mn0.8Ga9_qwNgeAKlqWI_xCLQPJFqGha3XfiNMxrT8_RXaM"
 );
+
 // Routes
 myapp.get("/", (req, res) => {
   res.render("LoginPage");
@@ -58,22 +55,22 @@ myapp.get("/Registerpage", (req, res) => {
   res.render("RegisterPage");
 });
 
-myapp.get("/StudentHomepage", async (req, res) => {
+myapp.get("/StudentHomepage", (req, res) => {
   try {
-    const studentData = req.session.studentData;
-    res.render("StudentHomepage", { studentData });
+    const studentData = res.locals.studentData;
     console.log("this is studenthomepage", studentData);
+    res.render("StudentHomepage", { studentData });
   } catch (error) {
     console.error("Error rendering StudentHomepage:", error);
     res.status(500).send("Internal Server Error");
   }
 });
 
-myapp.get("/studentProfilePage", async (req, res) => {
+myapp.get("/studentProfilePage", (req, res) => {
   try {
-    const studentData = req.session.studentData;
-    res.render("studentProfilePage", { studentData });
+    const studentData = res.locals.studentData;
     console.log("this is studentProfilePage", studentData);
+    res.render("studentProfilePage", { studentData });
   } catch (error) {
     console.error("Error rendering studentProfilePage:", error);
     res.status(500).send("Internal Server Error");
@@ -877,7 +874,9 @@ myapp.post("/login", async (req, res) => {
       // Store the student data in the session
       req.session.studentData = studentData;
       console.log("Student Data in Login Route:", req.session.studentData);
-      return res.status(200).json({ success: "Login successful", accountType: "Student" });
+      return res
+        .status(200)
+        .json({ success: "Login successful", accountType: "Student" });
     } else {
       // Fetch the counselor data from the specific table
       const { data: counselorData, error: counselorError } = await supabase
@@ -891,7 +890,9 @@ myapp.post("/login", async (req, res) => {
         // Store the counselor data in the session
         req.session.counselorData = counselorData;
         // Redirect to the counselor homepage
-        return res.status(200).json({ success: "Login successful", accountType: "Counselor" });
+        return res
+          .status(200)
+          .json({ success: "Login successful", accountType: "Counselor" });
       } else {
         console.error("User data not found");
         return res.status(404).json({ error: "User not found" });
@@ -902,7 +903,6 @@ myapp.post("/login", async (req, res) => {
     return res.status(500).json({ error: "Login failed" });
   }
 });
-
 
 // APPOINTMENT
 myapp.post("/create-appointment", async (req, res) => {
