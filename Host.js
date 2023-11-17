@@ -22,21 +22,21 @@ myapp.use(
   session({
     secret: "your_secret_key",
     resave: true,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { secure: false },
   })
 );
 
 const setStudentDataMiddleware = async (req, res, next) => {
-  const studentData = req.session.studentData; /* Your logic to retrieve student data */
-  // Pass studentData to all EJS templates
-  res.locals.studentData = studentData; // Use res.locals to make it available in EJS templates
+  console.log('Middleware executed');
+  const studentData = req.session.studentData;
+  console.log('Student Data in Middleware:', studentData);
+  res.locals.studentData = studentData;
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
-  next();
+  next(); 
 };
-
 
 myapp.use(
   ["/StudentHomepage", "/studentProfilePage"],
@@ -867,8 +867,9 @@ myapp.post("/login", async (req, res) => {
 
     // Check if the user is a student
     if (studentData) {
-      // Store the student data in the session
-      req.session.studentData = studentData;
+       // Store the student data in the session
+  req.session.studentData = studentData;
+  console.log('Student Data in Login Route:', req.session.studentData);
       res
         .status(200)
         .json({ success: "Login successful", accountType: "Student" });
