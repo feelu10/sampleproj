@@ -1,6 +1,7 @@
 [build]
+  publish = "views"
   functions = "functions"
-  publish = "views" 
+
 
 [[redirects]]
   from = "/assets/*"
