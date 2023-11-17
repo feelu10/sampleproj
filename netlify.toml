@@ -1,4 +1,9 @@
+[build]
+  functions = "functions"
+  publish = "views"  # Adjust this based on your static assets directory
+
 [[redirects]]
-  from = "/*"
-  to = "/Host.js"
+  from = "/assets/*"
+  to = "/assets/:splat"
   status = 200
+  force = true
