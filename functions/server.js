@@ -5,18 +5,18 @@ const myapp = express();
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 
-// const port = process.env.PORT || 3030;
-// myapp.listen(port, () => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
+const port = process.env.PORT || 3030;
+myapp.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
 
 // Middleware to parse JSON requests
 myapp.use(express.json());
 myapp.use(express.urlencoded({ extended: true }));
 myapp.use(cors());
 
-myapp.set('view engine', 'ejs');
-myapp.set('views', path.join(__dirname, '../view'));
+myapp.set("view engine", "ejs");
+myapp.set("views", __dirname + "/view");
 myapp.use(express.static(__dirname + "/assets"));
 
 myapp.use(
@@ -1685,8 +1685,8 @@ myapp.post("/adminCreateAccount", async (req, res) => {
 });
 
 
-// Convert the express app to a Netlify function
-exports.handler = (event, context) => {
-  const handler = app;
-  return handler(event, context);
-};
+// // Convert the express app to a Netlify function
+// exports.handler = (event, context) => {
+//   const handler = app;
+//   return handler(event, context);
+// };
