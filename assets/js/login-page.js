@@ -18,13 +18,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Send a POST request to your server with the login data
       try {
-        const response =await fetch("/login", {
+        const response = await fetch("/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, password }),
         });
+
+        // Log the response text for debugging
+        const responseText = await response.text();
+        console.log('Response from server:', responseText);
+
         if (!response.ok) {
           // Handle login failure
           console.error('Error during login:', response.statusText);
