@@ -43,13 +43,6 @@ myapp.use(
   setStudentDataMiddleware
 );
 
-const corsOptions = {
-  origin: "https://sampleproj-vert.vercel.app",
-  credentials: true, // include credentials in CORS headers (e.g., cookies)
-};
-
-myapp.use(cors(corsOptions));
-
 // Supabase configuration
 const { createClient, SupabaseClient } = require("@supabase/supabase-js");
 const supabase = createClient(
@@ -67,15 +60,26 @@ myapp.get("/Registerpage", (req, res) => {
 });
 
 myapp.get("/StudentHomepage", async (req, res) => {
-  const studentData = await req.session.studentData;
-  res.render("StudentHomepage", { studentData });
-  console.log("this is studenthomepage", studentData);
+  try {
+    const studentData = req.session.studentData;
+    res.render("StudentHomepage", { studentData });
+    console.log("this is studenthomepage", studentData);
+  } catch (error) {
+    console.error("Error rendering StudentHomepage:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
+
 myapp.get("/studentProfilePage", async (req, res) => {
-  const studentData = await req.session.studentData;
-  res.render("studentProfilePage", { studentData });
-  console.log("this is studentprofpage", studentData);
+  try {
+    const studentData = req.session.studentData;
+    res.render("studentProfilePage", { studentData });
+    console.log("this is studentProfilePage", studentData);
+  } catch (error) {
+    console.error("Error rendering studentProfilePage:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 myapp.get("/studentAppointmentStatus", async (req, res) => {
