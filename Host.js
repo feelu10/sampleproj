@@ -59,15 +59,14 @@ myapp.get("/StudentHomepage", (req, res) => {
   // Retrieve studentData from the session or create an empty object if it doesn't exist
   const studentData = req.session.studentData || {};
 
-  // Render the view with the current studentData
-  res.render("StudentHomepage", { studentData });
-  console.log('check data', studentData);
-
-  // Save the current studentData back to the session
+  // Save the current studentData back to the session before rendering the view
   req.session.studentData = studentData;
 
+  // Render the view with the current studentData
+  res.render("StudentHomepage", { studentData });
   console.log('check data for StudentHomepage after', req.session.studentData);
 });
+
 
 myapp.get('/studentProfilePage', (req, res) => {
   const studentData = req.session.studentData || {};
