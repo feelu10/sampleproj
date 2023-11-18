@@ -36,8 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-        // Parse the JSON response
-        // const data = await response.json();
+     
 
         // Check the user's account type and redirect accordingly
         if (data.accountType === 'Student') {
