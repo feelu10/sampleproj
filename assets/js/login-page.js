@@ -37,13 +37,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Parse the JSON response
-        const data = await response.json();
+        // const data = await response.json();
 
         // Check the user's account type and redirect accordingly
         if (data.accountType === 'Student') {
-          window.location.href = data.redirect || '/StudentHomepage'; // Redirect to student homepage
+          window.location.href = '/StudentHomepage'; // Redirect to student homepage
         } else if (data.accountType === 'Counselor') {
-          window.location.href = data.redirect || '/CounselorHomepage'; // Redirect to counselor homepage
+          window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
         } else {
           console.error('Unknown account type:', data.accountType);
         }
