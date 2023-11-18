@@ -800,10 +800,10 @@ myapp.post('/login', async (req, res) => {
         if (studentData) {
           console.log(studentData);
           
-          req.session.studentData = studentData;
-
-          // Redirect to the StudentHomepage
-          res.redirect('/StudentHomepage');
+        // Store the student data in the session
+        req.session.studentData = studentData;
+        res.status(200).json({ success: 'Login successful', accountType: 'Student' });
+        return;
 
     }
     else {
@@ -820,8 +820,8 @@ myapp.post('/login', async (req, res) => {
       // Store the counselor data in the session
       req.session.counselorData = counselorData;
       // Redirect to the counselor homepage
-      // res.status(200).json({ success: 'Login successful', accountType: 'Counselor' });
-      res.redirect('/CounselorHomepage');
+      res.status(200).json({ success: 'Login successful', accountType: 'Counselor' });
+        return;
     }
      else 
      {console.error('User data not found');
