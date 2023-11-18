@@ -176,7 +176,7 @@ myapp.get('/studentAppointmentHistory', async (req, res) => {
 });
 
 myapp.get('/CounselorList', (req, res) => {
-  const counselorData = req.session.counselorData;  
+  const counselorData = req.session.counselorData || {};  
   res.render('CounselorList');
   console.log(counselorData);
 });
@@ -189,7 +189,7 @@ myapp.get('/CreateAppointmentPage', (req, res) => {
 myapp.get('/CounselorHomePage',async (req, res) => {
     let hasNewAppointments;
     try {
-      const counselorData = req.session.counselorData;
+      const counselorData = req.session.counselorData || {};
       const counselorEmail = counselorData.email;
   
       // Fetch counselor's departments
@@ -301,7 +301,7 @@ myapp.get('/CounselorHomePage',async (req, res) => {
   });
 
 myapp.get('/CounselorProfilePage', (req, res) => {
-  const counselorData = req.session.counselorData;
+  const counselorData = req.session.counselorData || {};
   res.render('CounselorProfilePage', { counselorData });
   console.log(counselorData);
 });
@@ -309,7 +309,7 @@ myapp.get('/CounselorProfilePage', (req, res) => {
 myapp.get('/CounselorPendingAppointmentPage', async (req, res) => {
   let hasNewAppointments;
   try {
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email;
 
     console.log(counselorData);
@@ -442,7 +442,7 @@ console.log('Has new appointments:', newAppointments);
 myapp.get('/CounselorAcceptedAppointmentPage', async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email; // Assuming the email is stored in counselorData
 
     // Fetch pending appointments data for all departments associated with the counselor
@@ -471,7 +471,7 @@ myapp.get('/CounselorAcceptedAppointmentPage', async (req, res) => {
 myapp.get('/CounselorAppointmentHistoryPage', async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email; // Assuming the email is stored in counselorData
 
     // Fetch pending appointments data for all departments associated with the counselor
@@ -499,7 +499,7 @@ myapp.get('/CounselorAppointmentHistoryPage', async (req, res) => {
 
 myapp.get('/CounselorLogs', async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email;
     const { data: counselorLog, error } = await supabase
       .from('Report')
@@ -523,7 +523,7 @@ myapp.get('/CounselorLogs', async (req, res) => {
 });
 
 myapp.get('/CounselorReport', (req, res) => {
-  const counselorData = req.session.counselorData;
+  const counselorData = req.session.counselorData || {};
   res.render('CounselorReport', { counselorData });
   console.log(counselorData);
 
@@ -1049,7 +1049,7 @@ myapp.post('/updateDepartments', async (req, res) => {
 
 myapp.post('/acceptAppointment/:appointmentId', async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email;
     const counselorFName= counselorData.first_name;
     const counselorLName= counselorData.last_name;
@@ -1134,7 +1134,7 @@ myapp.post('/acceptAppointment/:appointmentId', async (req, res) => {
 
 myapp.post('/completeAppointment/:appointmentId', async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email;
     const counselorFName= counselorData.first_name;
     const counselorLName= counselorData.last_name;
@@ -1217,7 +1217,7 @@ myapp.post('/completeAppointment/:appointmentId', async (req, res) => {
 
 myapp.post('/rejectAppointment/:appointmentId', async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email;
     const counselorFName= counselorData.first_name;
     const counselorLName= counselorData.last_name;
@@ -1302,7 +1302,7 @@ myapp.post('/rejectAppointment/:appointmentId', async (req, res) => {
 
 myapp.post('/cancelAppointment/:appointmentId', async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
+    const counselorData = req.session.counselorData || {};
     const counselorEmail = counselorData.email;
     const counselorFName= counselorData.first_name;
     const counselorLName= counselorData.last_name;
