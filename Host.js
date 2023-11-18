@@ -59,12 +59,12 @@ myapp.get("/StudentHomepage", (req, res) => {
   // Retrieve studentData from the session or create an empty object if it doesn't exist
   const studentData = req.session.studentData || {};
 
-  // Save the current studentData back to the session before rendering the view
-  req.session.studentData = studentData;
-
+  
   // Render the view with the current studentData
   res.render("StudentHomepage", { studentData });
   console.log('check data for StudentHomepage after', req.session.studentData);
+  // Save the current studentData back to the session before rendering the view
+  req.session.studentData = studentData;
 });
 
 
@@ -800,10 +800,10 @@ myapp.post('/login', async (req, res) => {
         if (studentData) {
           console.log(studentData);
           
-        // Store the student data in the session
-        req.session.studentData = studentData;
-        res.status(200).json({ success: 'Login successful', accountType: 'Student' });
-        return;
+          req.session.studentData = studentData;
+
+          // Redirect to the StudentHomepage
+          res.redirect('/StudentHomepage');
 
     }
     else {
@@ -820,8 +820,8 @@ myapp.post('/login', async (req, res) => {
       // Store the counselor data in the session
       req.session.counselorData = counselorData;
       // Redirect to the counselor homepage
-      res.status(200).json({ success: 'Login successful', accountType: 'Counselor' });
-        return;
+      // res.status(200).json({ success: 'Login successful', accountType: 'Counselor' });
+      res.redirect('/CounselorHomepage');
     }
      else 
      {console.error('User data not found');
