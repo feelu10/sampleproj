@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
           sessionStorage.setItem('studentData', JSON.stringify(data.studentData));
           window.location.href = '/StudentHomepage'; // Redirect to student homepage
         } else if (data.accountType === 'Counselor') {
-          sessionStorage.setItem('counselorData', JSON.stringify(data.counserloData));
+          sessionStorage.setItem('counselorData', JSON.stringify(data.counselorData));
           window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
         } else {
           console.error('Unknown account type:', data.accountType);
