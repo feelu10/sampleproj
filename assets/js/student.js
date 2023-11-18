@@ -1,6 +1,3 @@
-// public/js/studentHomepage.js
-
-// Function to send data to the server and update session
 async function updateStudentData() {
     try {
       // Assume you have some data stored in sessionStorage

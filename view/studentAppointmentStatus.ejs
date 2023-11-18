@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Student Wellness Center | DLSU-D SWC</title>
+  <title>Appointment Status</title>
   <script src="inactivity.js"></script>
   <meta content="" name="description">
   <meta content="" name="keywords">
@@ -27,6 +27,8 @@
 
   <!-- Template Main CSS File -->
   <link href="/css/student-homepage-style.css" rel="stylesheet">
+  <link href="/css/spinner.css" rel="stylesheet">
+  <script src="/js/student.js" type="module" defer></script>
 </head>
 
 <body>
@@ -74,7 +76,6 @@
             </ul>
           </li>
 
-          <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
           <li><a class="getstarted scrollto" href="/">Logout</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -85,50 +86,76 @@
   </header><!-- End Header -->
 
   <main id="main">
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th scope="col">Time</th>
-            <th scope="col">Date</th>
-            <th scope="col">Counselor Email</th>
-            <th scope="col">Counselor</th>
-            <th scope="col">Appointed Time</th>
-            <th scope="col">Appointed Date</th>
-            <th scope="col">Program Status</th>
-            <th scope="col">Cancel</th>     
-          </tr>
-        </thead>
-        <tbody>
-            <% pendingAppointment.forEach((appointment) => { %>
-                <tr>
-                  <td><%= appointment.time %></td>
-                  <td><%= appointment.date %></td>
-                  <td>N/A</td>
-                  <td>N/A</td>
-                  <td><%= appointment.appointed_time %></td>
-                  <td><%= appointment.appointed_date %></td>
-                  <td><%= appointment.prog_stat %></td>
-                  <td>
-                    <button class="btn btn-danger cancel-appointment" data-appointment-id="<%= appointment.id %>">Cancel</button>
-                  </td>
-                </tr>
-              <% }); %>
-
-          <% acceptedAppointment.forEach((appointment) => { %>
-            <tr>
-              <td><%= appointment.time %></td>
-              <td><%= appointment.date %></td>
-              <td><%= appointment.counselor_email %></td>
-              <td><%= appointment.counselor_Lname %> <%= appointment.counselor_Fname %></td>
-              <td><%= appointment.appointed_time %></td>
-              <td><%= appointment.appointed_date %></td>
-              <td><%= appointment.prog_stat %></td>
-            </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </div>
+    <div className="table-responsive">
+      <table className="table border border-2 table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th scope="col">Time</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Counselor Email</th>
+                    <th scope="col">Counselor</th>
+                    <th scope="col">Appointed Time</th>
+                    <th scope="col">Appointed Date</th>
+                    <th scope="col">Program Status</th>
+                    <th scope="col">Cancel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% pendingAppointment.forEach((appointment)=> { %>
+                    <tr>
+                      <td>
+                        <%= appointment.time %>
+                      </td>
+                      <td>
+                        <%= appointment.date %>
+                      </td>
+                      <td>N/A</td>
+                      <td>N/A</td>
+                      <td>
+                        <%= appointment.appointed_time %>
+                      </td>
+                      <td>
+                        <%= appointment.appointed_date %>
+                      </td>
+                      <td>
+                        <%= appointment.prog_stat %>
+                      </td>
+                      <td>
+                        <button class="btn btn-danger cancel-appointment"
+                          data-appointment-id="<%= appointment.id %>">Cancel</button>
+                      </td>
+                    </tr>
+                    <% }); %>
+  
+                      <% acceptedAppointment.forEach((appointment)=> { %>
+                        <tr>
+                          <td>
+                            <%= appointment.time %>
+                          </td>
+                          <td>
+                            <%= appointment.date %>
+                          </td>
+                          <td>
+                            <%= appointment.counselor_email %>
+                          </td>
+                          <td>
+                            <%= appointment.counselor_Lname %>
+                              <%= appointment.counselor_Fname %>
+                          </td>
+                          <td>
+                            <%= appointment.appointed_time %>
+                          </td>
+                          <td>
+                            <%= appointment.appointed_date %>
+                          </td>
+                          <td>
+                            <%= appointment.prog_stat %>
+                          </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+              </table>
+            </div>  
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
@@ -144,7 +171,7 @@
         <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
       </div>
       <div class="copyright">
-        &copy; Copyright <strong><span>De La Salle</span></strong>. All Rights Reserved
+        &copy; Copyright <strong><span>Alvaran, Dimaya, Manalo</span></strong>. All Rights Reserved
       </div>
     </div>
   </footer><!-- End Footer -->
@@ -161,7 +188,7 @@
   <!-- Template Main JS File -->
   <script src="/js/home-page.js"></script>
   <script src="/js/cancelPendingAppointment.js"></script>
-
+  <script src="/js/spinner.js"></script>
   <style>
     body {
       display: flex;
@@ -180,5 +207,6 @@
       width: 100%;
     }
   </style>
+  <div class="loader"></div>
 </body>
 </html>

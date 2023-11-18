@@ -73,28 +73,21 @@ myapp.get('/StudentHomepage', (req, res) => {
 // Route to update student data
 myapp.post('/updateStudentData', (req, res) => {
   const clientData = req.body.clientData;
-
-  // Update the session with the client data
   req.session.studentData = clientData;
-
-  // Respond with the updated data
   res.status(200).json({ success: true, studentData: req.session.studentData });
 });
 
 
 // Add a route to get counselor data separately if needed
-myapp.get('/getCounselorData', (req, res) => {
-  const counselorData = req.session.counselorDatas;
-  res.status(200).json({ counselorDatas });
+myapp.post('/updateCounselorData', (req, res) => {
+  const clientData = req.body.clientData;
+  req.session.counselorData = clientData;
+  res.status(200).json({ success: true, counselorData: req.session.counselorData });
 });
 
 myapp.get("/studentProfilePage", async(req, res) => {
-   // Retrieve studentData from the session or create an empty object if it doesn't exist
    const studentData = await req.session.studentData || {};
- 
-   // Render the view with the current studentData
    res.render("studentProfilePage", { studentData });
- 
    console.log('check data for studentProfilePage', studentData);
 });
 
