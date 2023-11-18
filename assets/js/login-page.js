@@ -36,11 +36,13 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
 
-     
-
+        // Parse the JSON response
+        const data = await response.json();
+        
+        console.log(data);
         // Check the user's account type and redirect accordingly
         if (data.accountType === 'Student') {
-          window.location.href = '/StudentHomepage'; // Redirect to student homepage
+          // window.location.href = '/StudentHomepage'; // Redirect to student homepage
         } else if (data.accountType === 'Counselor') {
           window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
         } else {
