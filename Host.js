@@ -5,12 +5,15 @@ const myapp = express();
 const port = 3030;
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
+const bodyParser = require('body-parser');
+
 
 myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 // Middleware to parse JSON requests
 myapp.use(express.json());
+myapp.use(bodyParser.json());
 myapp.use(express.urlencoded({ extended: true }));
 myapp.use(cors());
 
@@ -25,9 +28,7 @@ myapp.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: true,
-    maxAge: 3600000, // 1 hour (adjust as needed),
-    sameSite: 'None', // For cross-site cookies
+    secure: false,
   },
 }));
 
@@ -59,28 +60,37 @@ myapp.get('/Registerpage', (req, res) => {
 });
 
 
+// Update the /StudentHomepage route
 myapp.get('/StudentHomepage', (req, res) => {
   // Retrieve session data
   const studentData = req.session.studentData || {};
-  console.log('Session Data (Before Update):', studentData);
 
-  // Do something with studentData
-
-  // Update the session data
-  req.session.studentData = studentData;
-  console.log('Session Data (After Update):', studentData);
-
-  // Render the view
+  // Render the view and pass the studentData to the template
   res.render('StudentHomepage', { studentData });
+  console.log(studentData);
 });
 
+// Route to update student data
+myapp.post('/updateStudentData', (req, res) => {
+  const clientData = req.body.clientData;
+
+  // Update the session with the client data
+  req.session.studentData = clientData;
+
+  // Respond with the updated data
+  res.status(200).json({ success: true, studentData: req.session.studentData });
+});
+
+
+// Add a route to get counselor data separately if needed
+myapp.get('/getCounselorData', (req, res) => {
+  const counselorData = req.session.counselorDatas;
+  res.status(200).json({ counselorDatas });
+});
 
 myapp.get("/studentProfilePage", async(req, res) => {
    // Retrieve studentData from the session or create an empty object if it doesn't exist
    const studentData = await req.session.studentData || {};
-
-   // Save the current studentData back to the session
-   req.session.studentData = studentData;
  
    // Render the view with the current studentData
    res.render("studentProfilePage", { studentData });
@@ -816,7 +826,7 @@ myapp.post('/login', async (req, res) => {
           
         // Store the student data in the session
         req.session.studentData = studentData;
-        res.status(200).json({ success: 'Login successful', accountType: 'Student' });
+        res.status(200).json({ success: 'Login successful', accountType: 'Student', studentData:studentData });
         return;
 
     }
@@ -834,7 +844,7 @@ myapp.post('/login', async (req, res) => {
       // Store the counselor data in the session
       req.session.counselorData = counselorData;
       // Redirect to the counselor homepage
-      res.status(200).json({ success: 'Login successful', accountType: 'Counselor' });
+      res.status(200).json({ success: 'Login successful', accountType: 'Counselor', counselorData:counselorData });
         return;
     }
      else 
