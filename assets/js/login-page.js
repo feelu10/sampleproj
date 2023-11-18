@@ -21,43 +21,37 @@ document.addEventListener("DOMContentLoaded", function () {
       // Send a POST request to your server with the login data
       try {
         const response = await fetch("/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
         });
-    
+
         if (!response.ok) {
-            // Handle login failure
-            console.error('Error during login:', response.statusText);
-            // Hide the loading screen in case of an error
-            hideLoadingScreen();
-            return;
+          // Handle login failure
+          console.error('Error during login:', response.statusText);
+          // Hide the loading screen in case of an error
+          hideLoadingScreen();
+          return;
         }
-    
-        // Check if the response has a JSON content type before reading
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            // Parse the JSON response
-            const data = await response.json();
-    
-            // Check the user's account type and redirect accordingly
-            if (data.accountType === 'Student') {
-                window.location.href = '/StudentHomepage'; // Redirect to student homepage
-            } else if (data.accountType === 'Counselor') {
-                window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
-            } else {
-                console.error('Unknown account type:', data.accountType);
-            }
+
+        // Parse the JSON response
+        const data = await response.json();
+
+        // Check the user's account type and redirect accordingly
+        if (data.accountType === 'Student') {
+          window.location.href = '/StudentHomepage'; // Redirect to student homepage
+        } else if (data.accountType === 'Counselor') {
+          window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
         } else {
-            console.error('Unexpected response format. Expected JSON.');
+          console.error('Unknown account type:', data.accountType);
         }
-    } catch (error) {
+      } catch (error) {
         console.error('Error during login:', error);
         // Hide the loading screen in case of an error
         hideLoadingScreen();
-    }
+      }
     });
   }
 });
