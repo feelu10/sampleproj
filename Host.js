@@ -80,8 +80,8 @@ myapp.post('/updateStudentData', (req, res) => {
 
 // Add a route to get counselor data separately if needed
 myapp.post('/updateCounselorData', (req, res) => {
-  const clientData = req.body.clientData;
-  req.session.counselorData = clientData;
+  const clientDatas = req.body.clientDatas;
+  req.session.counselorData = clientDatas;
   res.status(200).json({ success: true, counselorData: req.session.counselorData });
 });
 
@@ -125,6 +125,7 @@ myapp.get('/studentAppointmentStatus', async (req, res) => {
     }
 
     res.render('studentAppointmentStatus', { studentData, pendingAppointment, acceptedAppointment });
+    console.log(counselorData);
   } catch (error1) {
     // Handle any unexpected server errors
     console.error('Server error:', error1.message);
@@ -175,7 +176,9 @@ myapp.get('/studentAppointmentHistory', async (req, res) => {
 });
 
 myapp.get('/CounselorList', (req, res) => {
+  const counselorData = req.session.counselorData;  
   res.render('CounselorList');
+  console.log(counselorData);
 });
 
 myapp.get('/CreateAppointmentPage', (req, res) => {
@@ -289,6 +292,7 @@ myapp.get('/CounselorHomePage',async (req, res) => {
   
       const pendingAppointmentsCount = newAppointments.length;
       res.render('CounselorHomePage', { counselorData, pendingAppointments: updatedPendingAppointments, hasNewAppointments: hasNewAppointments, pendingAppointmentsCount:pendingAppointmentsCount });
+      console.log(counselorData);
     } catch (error) {
       
       console.error('Server error:', error.message);
@@ -299,6 +303,7 @@ myapp.get('/CounselorHomePage',async (req, res) => {
 myapp.get('/CounselorProfilePage', (req, res) => {
   const counselorData = req.session.counselorData;
   res.render('CounselorProfilePage', { counselorData });
+  console.log(counselorData);
 });
 
 myapp.get('/CounselorPendingAppointmentPage', async (req, res) => {
@@ -306,6 +311,9 @@ myapp.get('/CounselorPendingAppointmentPage', async (req, res) => {
   try {
     const counselorData = req.session.counselorData;
     const counselorEmail = counselorData.email;
+
+    console.log(counselorData);
+
 
     // Fetch counselor's departments
     const { data: counselorDepartments, error: counselorError } = await supabase
@@ -451,6 +459,8 @@ myapp.get('/CounselorAcceptedAppointmentPage', async (req, res) => {
     }
 
     res.render('CounselorAcceptedAppointmentPage', { counselorData, acceptedAppointments });
+    console.log(counselorData);
+
   } catch (error) {
     // Handle any unexpected server errors
     console.error('Server error:', error.message);
@@ -478,6 +488,8 @@ myapp.get('/CounselorAppointmentHistoryPage', async (req, res) => {
     }
 
     res.render('CounselorAppointmentHistoryPage', { counselorData, appointmentHistory });
+    console.log(counselorData);
+
   } catch (error) {
     // Handle any unexpected server errors
     console.error('Server error:', error.message);
@@ -501,6 +513,8 @@ myapp.get('/CounselorLogs', async (req, res) => {
     }
 
     res.render('CounselorLogs', { counselorLog });
+    console.log(counselorData);
+
   } catch (error) {
     // Handle any unexpected server errors
     console.error('Server error:', error.message);
@@ -511,6 +525,8 @@ myapp.get('/CounselorLogs', async (req, res) => {
 myapp.get('/CounselorReport', (req, res) => {
   const counselorData = req.session.counselorData;
   res.render('CounselorReport', { counselorData });
+  console.log(counselorData);
+
 });
 
 myapp.get('/emailSuggestions', async (req, res) => {
