@@ -41,7 +41,7 @@ myapp.use(
     resave: false,
     saveUninitialized: true,
     store: store,
-    cookie: { secure: truegit },
+    cookie: { secure: true },  // Adjust to true or false based on your deployment environment
   })
 );
 
