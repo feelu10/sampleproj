@@ -1,4 +1,3 @@
-// Wait for the DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function () {
   // Get a reference to the login form by its ID
   const loginForm = document.getElementById("login-form");
@@ -12,11 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault(); // Prevent the default form submission
 
+      // Show the loading screen
+      showLoadingScreen();
+
       // Get the user's email and password from the input fields
       const email = emailInput.value;
       const password = passwordInput.value;
-
-      console.log("Login form submitted:", { email, password });
 
       // Send a POST request to your server with the login data
       try {
@@ -28,31 +28,48 @@ document.addEventListener("DOMContentLoaded", function () {
           body: JSON.stringify({ email, password }),
         });
 
-        console.log("Login response:", response);
-
         if (!response.ok) {
           // Handle login failure
-          console.error("Error during login:", response.statusText);
+          console.error('Error during login:', response.statusText);
+          // Hide the loading screen in case of an error
+          hideLoadingScreen();
           return;
         }
 
         // Parse the JSON response
         const data = await response.json();
 
-        console.log("Login data:", data);
-
         // Check the user's account type and redirect accordingly
-        if (data.accountType === "Student") {
-          window.location.href = "/StudentHomepage"; // Redirect to student homepage
-        } else if (data.accountType === "Counselor") {
-          window.location.href = "/CounselorHomepage"; // Redirect to counselor homepage
+        if (data.accountType === 'Student') {
+          sessionStorage.setItem('studentData', JSON.stringify(data.studentData));
+          window.location.href = '/StudentHomepage'; // Redirect to student homepage
+        } else if (data.accountType === 'Counselor') {
+          sessionStorage.setItem('counselorData', JSON.stringify(data.counselorData));
+          window.location.href = '/CounselorHomepage'; // Redirect to counselor homepage
         } else {
-          console.error("Unknown account type:", data.accountType);
+          console.error('Unknown account type:', data.accountType);
         }
       } catch (error) {
-        console.error("Error during login:", error);
+        console.error('Error during login:', error);
+        // Hide the loading screen in case of an error
+        hideLoadingScreen();
       }
     });
   }
 });
-  
+
+// Function to show the loading screen
+function showLoadingScreen() {
+  const loadingScreen = document.getElementById("loading-screen");
+  if (loadingScreen) {
+    loadingScreen.style.display = "flex";
+  }
+}
+
+// Function to hide the loading screen
+function hideLoadingScreen() {
+  const loadingScreen = document.getElementById("loading-screen");
+  if (loadingScreen) {
+    loadingScreen.style.display = "none";
+  }
+}
