@@ -11,6 +11,4 @@
       "src": "/(.*)",
       "dest":  "/Host.js"
     }
-  ],
-  "maxDuration": 30 
 }
