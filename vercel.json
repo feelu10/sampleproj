@@ -1,15 +1,16 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "Host.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest":  "/Host.js"
-      }
-    ]
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "Host.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest":  "/Host.js"
+    }
+  ],
+  "maxDuration": 30 // Increase the timeout value as needed
+}
