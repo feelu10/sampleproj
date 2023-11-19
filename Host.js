@@ -80,8 +80,8 @@ myapp.post('/updateStudentData', (req, res) => {
 
 // Add a route to get counselor data separately if needed
 myapp.post('/updateCounselorData', (req, res) => {
-  const clientDatas = req.body.clientDatas;
-  req.session.counselorData = clientDatas;
+  const clientData = req.body.clientData;
+  req.session.counselorData = clientData;
   res.status(200).json({ success: true, counselorData: req.session.counselorData });
 });
 
