@@ -1,10 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
-const myapp = express();
-const port = 3030;
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+const { connectToMongoDB } = require("./connection");
+
+const myapp = express();
+const port = process.env.PORT || 3030;
 
 myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
@@ -18,19 +21,32 @@ myapp.set("view engine", "ejs");
 myapp.set("views", __dirname + "/view");
 myapp.use(express.static(__dirname + "/assets"));
 
+// Connect to MongoDB
+connectToMongoDB();
+
+// Create a new instance of MongoDBStore
+const store = new MongoDBStore({
+  uri: "mongodb+srv://sample:sample@cluster0.ebmn6s8.mongodb.net/sample",
+  collection: "sample",
+});
+// Catch errors in the MongoDBStore
+store.on("error", function (error) {
+  console.error("MongoDBStore error:", error);
+});
+
+// Set up session middleware with the MongoDBStore
 myapp.use(
   session({
-    secret: "your_secret_key",
+    secret: "long_random_secret_key",
     resave: false,
     saveUninitialized: true,
+    store: store,
     cookie: { secure: false },
   })
 );
 
 myapp.use((req, res, next) => {
-  const studentData =
-    req.session.studentData; /* Your logic to retrieve student data */
-  // Pass studentData to all EJS templates
+  const studentData = req.session.studentData;
   res.locals.studentData = studentData;
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Pragma", "no-cache");
