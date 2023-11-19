@@ -9,72 +9,65 @@ const { connectToMongoDB } = require("./connection");
 const myapp = express();
 const port = process.env.PORT || 3030;
 
-myapp.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-// Middleware to parse JSON requests
-myapp.use(express.json());
-myapp.use(express.urlencoded({ extended: true }));
-myapp.use(cors());
+myapp.listen(port, async () => {
+  try {
+    const client = await connectToMongoDB();
+    const store = new MongoDBStore({
+      client: client,
+      collection: "sample",
+    });
 
-myapp.set("view engine", "ejs");
-myapp.set("views", __dirname + "/view");
-myapp.use(express.static(__dirname + "/assets"));
+    // Middleware to parse JSON requests
+    myapp.use(express.json());
+    myapp.use(express.urlencoded({ extended: true }));
+    myapp.use(cors());
 
-// Connect to MongoDB
-connectToMongoDB();
+    myapp.set("view engine", "ejs");
+    myapp.set("views", __dirname + "/view");
+    myapp.use(express.static(__dirname + "/assets"));
 
-// Create a new instance of MongoDBStore
-const store = new MongoDBStore({
-  uri: "mongodb+srv://sample:sample@cluster0.ebmn6s8.mongodb.net/sample",
-  collection: "sample",
-});
-// Catch errors in the MongoDBStore
-store.on("error", function (error) {
-  console.error("MongoDBStore error:", error);
-});
+    // Set up session middleware with the MongoDBStore
+    myapp.use(
+      session({
+        secret: "long_random_secret_key",
+        resave: false,
+        saveUninitialized: true,
+        store: store,
+        cookie: { secure: false },
+      })
+    );
 
-// Set up session middleware with the MongoDBStore
-myapp.use(
-  session({
-    secret: "long_random_secret_key",
-    resave: false,
-    saveUninitialized: true,
-    store: store,
-    cookie: { secure: false },
-  })
-);
+    myapp.use((req, res, next) => {
+      const studentData = req.session.studentData;
+      res.locals.studentData = studentData;
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+      next();
+    });
 
-myapp.use((req, res, next) => {
-  const studentData = req.session.studentData;
-  res.locals.studentData = studentData;
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
-  next();
-});
+    // Supabase configuration
+    const { createClient, SupabaseClient } = require("@supabase/supabase-js");
+    const supabase = createClient(
+      "https://waeqvekicdlqijxmhclw.supabase.co",
+      "your-supabase-api-key-here"
+    );
 
-// Supabase configuration
-const { createClient, SupabaseClient } = require("@supabase/supabase-js");
-const supabase = createClient(
-  "https://waeqvekicdlqijxmhclw.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhZXF2ZWtpY2RscWlqeG1oY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTUyNjMxNjIsImV4cCI6MjAxMDgzOTE2Mn0.8Ga9_qwNgeAKlqWI_xCLQPJFqGha3XfiNMxrT8_RXaM"
-);
+    //=========GETTING===========//
+    myapp.get("/", (req, res) => {
+      res.render("LoginPage");
+    });
 
-//=========GETTING===========//
-myapp.get("/", (req, res) => {
-  res.render("LoginPage");
-});
+    myapp.get("/Registerpage", (req, res) => {
+      res.render("RegisterPage");
+    });
 
-myapp.get("/Registerpage", (req, res) => {
-  res.render("RegisterPage");
-});
+    myapp.get("/StudentHomepage", (req, res) => {
+      const studentData = req.session.studentData;
+      res.render("StudentHomepage", { studentData });
+      console.log("Student Home Page data", studentData);
+    });
 
-myapp.get("/StudentHomepage", (req, res) => {
-  const studentData = req.session.studentData;
-  res.render("StudentHomepage", { studentData });
-  console.log("Student Home Page data", studentData)
-});
 
 myapp.get("/studentProfilePage", (req, res) => {
   const studentData = req.session.studentData;
@@ -1691,4 +1684,10 @@ myapp.post("/adminCreateAccount", async (req, res) => {
     console.error("Unexpected error:", e);
     res.status(500).json({ error: "Registration failed" });
   }
+});
+
+console.log(`Server is running on http://localhost:${port}`);
+} catch (error) {
+  console.error('Failed to start the server:', error);
+}
 });
