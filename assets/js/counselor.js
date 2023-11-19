@@ -8,7 +8,7 @@ async function updateCounselorData() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ clientDatas: storedData }),
+      body: JSON.stringify({ clientData: storedData }),
     });
 
     if (response.ok) {
