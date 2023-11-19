@@ -12,5 +12,5 @@
       "dest":  "/Host.js"
     }
   ],
-  "maxDuration": 30 // Increase the timeout value as needed
+  "maxDuration": 30 
 }
