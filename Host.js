@@ -1,13 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const ejs = require("ejs");
+const myapp = express();
+const port = 3030;
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
-const { connectToMongoDB } = require("./connection");
-
-const myapp = express();
-const port = process.env.PORT || 3030;
 
 myapp.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
@@ -21,36 +18,21 @@ myapp.set("view engine", "ejs");
 myapp.set("views", __dirname + "/view");
 myapp.use(express.static(__dirname + "/assets"));
 
-// Connect to MongoDB
-connectToMongoDB();
-
-// Create a new instance of MongoDBStore
-const store = new MongoDBStore({
-  uri: "mongodb+srv://sample:sample@cluster0.ebmn6s8.mongodb.net/sample",
-  collection: "sample",
-});
-// Catch errors in the MongoDBStore
-store.on("error", function (error) {
-  console.error("MongoDBStore error:", error);
-});
-
-// Set up session middleware with the MongoDBStore
 myapp.use(
   session({
-    secret: "long_random_secret_key",
+    secret: "123",
     resave: false,
     saveUninitialized: true,
-    store: store,
-    cookie: { secure: true },  // Adjust to true or false based on your deployment environment
+    cookie: { secure: false },
   })
 );
 
 myapp.use((req, res, next) => {
-  const studentData = req.session.studentData;
-  res.locals.studentData = studentData;
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
 
@@ -71,21 +53,21 @@ myapp.get("/Registerpage", (req, res) => {
 });
 
 myapp.get("/StudentHomepage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData = req.session.studentData || {};
   res.render("StudentHomepage", { studentData });
-  console.log("Student Home Page data", studentData)
+  console.log("This the data for Student Homepge", studentData);
 });
 
 myapp.get("/studentProfilePage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData = req.session.studentData || {};
   res.render("studentProfilePage", { studentData });
-  console.log("SstudentProfilePage data", studentData)
+  console.log("This the data for studentProfilePage", studentData);
 });
 
 myapp.get("/studentAppointmentStatus", async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const studentData = req.session.studentData;
+    const studentData = req.session.studentData || {};
     const studentEmail = studentData.email; // Assuming the email is stored in counselorData
 
     // Fetch pending appointments data for all departments associated with the counselor
@@ -129,7 +111,7 @@ myapp.get("/studentAppointmentStatus", async (req, res) => {
 myapp.get("/studentAppointmentHistory", async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const studentData = req.session.studentData;
+    const studentData = req.session.studentData || {};
     const studentEmail = studentData.email; // Assuming the email is stored in counselorData
 
     // Fetch pending appointments data for all departments associated with the counselor
@@ -172,33 +154,36 @@ myapp.get("/studentAppointmentHistory", async (req, res) => {
 });
 
 myapp.get("/CounselorList", (req, res) => {
+  const counselorData = req.session.counselorData || {};
   res.render("CounselorList");
 });
 
 myapp.get("/CreateAppointmentPage", (req, res) => {
-  const studentData = req.session.studentData;
+  const studentData = req.session.studentData || {};
   res.render("CreateAppointmentPage", { studentData });
 });
 
 myapp.get("/CounselorHomePage", async (req, res) => {
+  console.log("Session data of Counselor:", req.session);
+
   let hasNewAppointments;
   try {
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email;
+    console.log("Session data before counselorData retrieval:", req.session);
+    const counselorData = req.session.counselorData || {};
+    console.log("Counselor data retrieved:", counselorData);
+
+    // if (!counselorData || !counselorData.email) {
+    //   console.error("Counselor data not found in session.");
+    //   return res.status(401).send("Unauthorized");
+    // }
+
+    const counselorEmail = counselorData.email || {};
 
     // Fetch counselor's departments
     const { data: counselorDepartments, error: counselorError } = await supabase
       .from("Counselor Role")
       .select("department")
       .eq("email", counselorEmail);
-
-    if (counselorError) {
-      console.error(
-        "Error fetching counselor departments:",
-        counselorError.message
-      );
-      return res.status(500).send("Internal server error");
-    }
 
     const departments = counselorDepartments.map((entry) => entry.department);
 
@@ -310,15 +295,15 @@ myapp.get("/CounselorHomePage", async (req, res) => {
 });
 
 myapp.get("/CounselorProfilePage", (req, res) => {
-  const counselorData = req.session.counselorData;
+  const counselorData = req.session.counselorData || {};
   res.render("CounselorProfilePage", { counselorData });
 });
 
 myapp.get("/CounselorPendingAppointmentPage", async (req, res) => {
   let hasNewAppointments;
   try {
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email;
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
 
     // Fetch counselor's departments
     const { data: counselorDepartments, error: counselorError } = await supabase
@@ -461,16 +446,13 @@ myapp.get("/CounselorPendingAppointmentPage", async (req, res) => {
 
 myapp.get("/CounselorAcceptedAppointmentPage", async (req, res) => {
   try {
-    // Extract counselor's email from the session data
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email; // Assuming the email is stored in counselorData
-
-    // Fetch pending appointments data for all departments associated with the counselor
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
     const { data: acceptedAppointments, error } = await supabase
-      .from("Accepted Appointment") // Replace with your actual table name
+      .from("Accepted Appointment")
       .select("*")
       .eq("counselor_email", counselorEmail)
-      .order("date", { ascending: true }); // You can add additional query options here
+      .order("date", { ascending: true });
 
     if (error) {
       // Handle the error if the query for pending appointments fails
@@ -492,9 +474,8 @@ myapp.get("/CounselorAcceptedAppointmentPage", async (req, res) => {
 myapp.get("/CounselorAppointmentHistoryPage", async (req, res) => {
   try {
     // Extract counselor's email from the session data
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email; // Assuming the email is stored in counselorData
-
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
     // Fetch pending appointments data for all departments associated with the counselor
     const { data: appointmentHistory, error } = await supabase
       .from("Appointment History") // Replace with your actual table name
@@ -521,8 +502,8 @@ myapp.get("/CounselorAppointmentHistoryPage", async (req, res) => {
 
 myapp.get("/CounselorLogs", async (req, res) => {
   try {
-    const counselorData = req.session.counselorData;
-    const counselorEmail = counselorData.email;
+    const counselorData = req.session.counselorData || {};
+    const counselorEmail = counselorData.email || {};
     const { data: counselorLog, error } = await supabase
       .from("Report")
       .select("*")
@@ -545,7 +526,7 @@ myapp.get("/CounselorLogs", async (req, res) => {
 });
 
 myapp.get("/CounselorReport", (req, res) => {
-  const counselorData = req.session.counselorData;
+  const counselorData = req.session.counselorData || {};
   res.render("CounselorReport", { counselorData });
 });
 
@@ -845,6 +826,8 @@ myapp.post("/register", async (req, res) => {
 });
 
 // LOGIN
+// Existing code...
+
 myapp.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -879,6 +862,8 @@ myapp.post("/login", async (req, res) => {
 
       // Store the student data in the session
       req.session.studentData = studentData;
+      req.session.save();
+
       return res.status(200).json({
         success: "Login successful",
         accountType: "Student",
@@ -894,8 +879,11 @@ myapp.post("/login", async (req, res) => {
       // Check if the user is a counselor
       if (counselorData) {
         console.log("Counselor data found:", counselorData);
+
         // Store the counselor data in the session
         req.session.counselorData = counselorData;
+        req.session.save();
+
         // Redirect to the counselor homepage
         return res.status(200).json({
           success: "Login successful",
@@ -911,6 +899,7 @@ myapp.post("/login", async (req, res) => {
     return res.status(500).json({ error: "Login failed" });
   }
 });
+
 
 // APPOINTMENT
 myapp.post("/create-appointment", async (req, res) => {
